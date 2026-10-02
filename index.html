@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aptis Flashcards Trainer</title>
-  <!-- Tailwind CSS para el diseño -->
+  <title>Aptis Flashcards Trainer | Uptown Academy</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PapaParse para leer el Google Sheet automáticamente -->
+  <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
     .perspective { perspective: 1000px; }
@@ -15,117 +15,142 @@
     .rotate-y-180 { transform: rotateY(180deg); }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4 selection:bg-indigo-100">
+<body class="bg-[#14393e] min-h-screen text-slate-100 flex flex-col items-center justify-between p-4 selection:bg-teal-800 selection:text-white">
 
-  <!-- Header -->
-  <header class="w-full max-w-xl text-center py-6">
-    <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight">Aptis Flashcards</h1>
-    <p class="text-sm text-slate-500 mt-1">Practica gramática, vocabulario y conectores clave</p>
-  </header>
+  <!-- Contenedor Principal Centrado -->
+  <div class="w-full max-w-xl flex flex-col items-center">
 
-  <!-- Filtros -->
-  <section class="w-full max-w-xl bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-center justify-between">
-    <div>
-      <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Categoría</label>
-      <select id="categoryFilter" class="bg-slate-50 border border-slate-300 text-sm rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-        <option value="all">Todas las categorías</option>
-      </select>
-    </div>
+    <!-- Header con Logotipo y Enlace a la Academia -->
+    <header class="w-full text-center pt-4 pb-6 flex flex-col items-center">
+      <!-- Enlace y Logo -->
+      <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group inline-flex flex-col items-center transition hover:opacity-90">
+        <img 
+          src="https://academiauptown.com/wp-content/uploads/logo.png" 
+          alt="Uptown Academy" 
+          class="h-14 sm:h-16 w-auto object-contain mb-2 drop-shadow-md transition-transform group-hover:scale-105"
+          onerror="this.style.display='none'"
+        />
+        <span class="text-xs uppercase tracking-widest font-bold text-teal-200/70 group-hover:text-teal-200 transition">
+          academiauptown.com ↗
+        </span>
+      </a>
 
-    <div>
-      <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
-      <select id="levelFilter" class="bg-slate-50 border border-slate-300 text-sm rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-        <option value="all">Todos los niveles</option>
-      </select>
-    </div>
+      <!-- Título de la Aplicación -->
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-3">
+        Aptis Training Flashcards
+      </h1>
+      <p class="text-xs sm:text-sm text-teal-100/80 mt-1">
+        Práctica oficial de vocabulario, colocaciones y conectores
+      </p>
+    </header>
 
-    <div class="text-right">
-      <span class="text-xs font-semibold text-slate-400 block uppercase">Progreso</span>
-      <span id="counter" class="text-base font-bold text-indigo-600">0 / 0</span>
-    </div>
-  </section>
-
-  <!-- Contenedor Flashcard -->
-  <main class="w-full max-w-xl perspective mb-6">
-    <div id="loading" class="text-center py-20 bg-white rounded-2xl shadow-md border border-slate-200">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-3"></div>
-      <p class="text-slate-600 font-medium">Cargando tarjetas...</p>
-    </div>
-
-    <div id="flashcard" class="relative w-full h-96 bg-transparent cursor-pointer transform-style-3d transition-transform duration-500 select-none hidden" onclick="flipCard()">
-      <!-- Cara Delantera -->
-      <div class="absolute inset-0 bg-white border border-slate-200 rounded-2xl p-6 shadow-md flex flex-col justify-between backface-hidden">
-        <div class="flex justify-between items-center">
-          <span id="cardCategory" class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100">Categoría</span>
-          <span id="cardLevel" class="px-2.5 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-full border border-amber-100">B2</span>
-        </div>
-        <div class="text-center my-auto px-4">
-          <p id="cardFront" class="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">Término en inglés</p>
-          <span class="text-xs text-indigo-500 block mt-4 font-medium flex items-center justify-center gap-1">
-            👆 Toca para ver la respuesta
-          </span>
-        </div>
-        <div class="text-center">
-          <span class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">Aptis Test Prep</span>
-        </div>
+    <!-- Filtros de Estudio -->
+    <section class="w-full bg-[#1b4b52] p-4 rounded-2xl shadow-lg border border-[#235d65] mb-6 flex flex-wrap gap-4 items-center justify-between">
+      <div class="flex-1 min-w-[140px]">
+        <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-1">Categoría</label>
+        <select id="categoryFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-sm font-medium rounded-xl p-2.5 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
+          <option value="all">Todas las categorías</option>
+        </select>
       </div>
 
-      <!-- Cara Trasera -->
-      <div class="absolute inset-0 bg-indigo-900 border border-indigo-800 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
-        <div>
-          <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Significado / Uso</span>
-          <p id="cardBack" class="text-xl font-bold mt-1 text-indigo-50">Definición en español</p>
+      <div class="w-32">
+        <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-1">Nivel</label>
+        <select id="levelFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-sm font-medium rounded-xl p-2.5 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
+          <option value="all">Todos los niveles</option>
+        </select>
+      </div>
+
+      <div class="text-right pl-2">
+        <span class="text-[11px] font-bold text-teal-200 block uppercase tracking-wider">Tarjeta</span>
+        <span id="counter" class="text-base font-extrabold text-teal-300">0 / 0</span>
+      </div>
+    </section>
+
+    <!-- Tarjeta Interactiva -->
+    <main class="w-full perspective mb-6">
+      <div id="loading" class="text-center py-20 bg-[#1b4b52] rounded-2xl shadow-lg border border-[#235d65]">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-400 border-t-transparent mb-3"></div>
+        <p class="text-teal-100 font-medium text-sm">Cargando material de Aptis...</p>
+      </div>
+
+      <div id="flashcard" class="relative w-full h-[380px] bg-transparent cursor-pointer transform-style-3d transition-transform duration-500 select-none hidden" onclick="flipCard()">
+        <!-- Front Side -->
+        <div class="absolute inset-0 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between backface-hidden text-slate-800">
+          <div class="flex justify-between items-center">
+            <span id="cardCategory" class="px-3 py-1 text-xs font-semibold bg-[#14393e]/10 text-[#14393e] rounded-full border border-[#14393e]/20">Categoría</span>
+            <span id="cardLevel" class="px-3 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-full border border-amber-200">B2</span>
+          </div>
+
+          <div class="text-center my-auto px-2">
+            <p id="cardFront" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">Cargando...</p>
+            <span class="inline-flex items-center gap-1.5 text-xs text-[#14393e] bg-teal-50 border border-teal-200 rounded-full px-3 py-1.5 mt-5 font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
+              Toca para ver el reverso
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <span>Uptown Language Academy</span>
+            <span>Espacio / Clic para voltear</span>
+          </div>
         </div>
 
-        <div class="my-3 bg-indigo-950/60 p-3.5 rounded-lg border border-indigo-800/80">
-          <span class="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold block mb-1">Ejemplo en contexto</span>
-          <p id="cardExample" class="text-sm italic text-indigo-100">"Ejemplo de uso en oración"</p>
-        </div>
+        <!-- Back Side -->
+        <div class="absolute inset-0 bg-[#0e272b] border border-[#1b4b52] text-white rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
+          <div>
+            <span class="text-[11px] uppercase tracking-wider text-teal-300 font-bold">Traducción / Significado</span>
+            <p id="cardBack" class="text-xl sm:text-2xl font-bold mt-1 text-teal-50">Significado</p>
+          </div>
 
-        <div>
-          <span class="text-[11px] uppercase tracking-wider text-amber-300 font-semibold block mb-0.5">💡 Consejo Aptis</span>
-          <p id="cardTip" class="text-xs text-indigo-200">Consejo de examen</p>
+          <div class="my-3 bg-[#14393e]/70 p-4 rounded-2xl border border-[#235d65]">
+            <span class="text-[11px] uppercase tracking-wider text-teal-300 font-bold block mb-1">Ejemplo de uso</span>
+            <p id="cardExample" class="text-sm italic text-teal-100">"Example sentence goes here"</p>
+          </div>
+
+          <div>
+            <span class="text-[11px] uppercase tracking-wider text-amber-300 font-bold block mb-1">💡 Consejo Aptis</span>
+            <p id="cardTip" class="text-xs text-teal-100/90">Consejo clave para el examen.</p>
+          </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <!-- Botones de Navegación -->
-  <footer class="w-full max-w-xl flex gap-3">
-    <button onclick="prevCard()" class="flex-1 py-3 px-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-300 shadow-sm transition active:scale-98">
-      ⬅ Anterior
-    </button>
-    <button onclick="randomCard()" class="py-3 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl border border-indigo-200 shadow-sm transition active:scale-98" title="Tarjeta aleatoria">
-      🎲
-    </button>
-    <button onclick="nextCard()" class="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition active:scale-98">
-      Siguiente ➡
-    </button>
-  </footer>
+    <!-- Controles / Navegación -->
+    <footer class="w-full flex gap-3">
+      <button onclick="prevCard()" class="flex-1 py-3 px-4 bg-[#1b4b52] hover:bg-[#235d65] text-white font-bold text-sm rounded-xl border border-[#2b6a74] shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Anterior
+      </button>
+
+      <button onclick="randomCard()" class="py-3 px-5 bg-[#0f2c30] hover:bg-[#1b4b52] text-teal-200 font-bold text-sm rounded-xl border border-[#235d65] shadow-md transition active:scale-95" title="Tarjeta aleatoria">
+        🎲
+      </button>
+
+      <button onclick="nextCard()" class="flex-1 py-3 px-4 bg-teal-500 hover:bg-teal-400 text-slate-900 font-extrabold text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+        Siguiente
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- Pie de Página Institucional -->
+  <div class="mt-8 text-center text-xs text-teal-200/60 py-3">
+    Desarrollado para alumnos de <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="font-semibold text-teal-100 hover:text-white underline decoration-teal-400/50">Uptown Language Academy</a>
+  </div>
 
   <script>
     // ==========================================
-    // 🔗 PEGA AQUÍ TU ENLACE PUBLICADO DE GOOGLE SHEETS (CSV):
+    // 🔗 TU ENLACE CSV PUBLICADO DE GOOGLE SHEETS
     // ==========================================
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1GO3YBXDNSSa8kRISPNkq8ETGTHQEbMtH4hmvimEdNNE/edit?usp=sharing";
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vREEMPLAZA_ESTO_POR_TU_LINK/pub?output=csv";
 
     let allCards = [];
     let filteredCards = [];
     let currentIndex = 0;
     let isFlipped = false;
 
-    // Cargar datos desde Google Sheets al iniciar
     async function loadData() {
-      if (SHEET_CSV_URL.includes("REEMPLAZA_ESTO")) {
-        document.getElementById('loading').innerHTML = `
-          <div class="p-6 text-left text-sm text-amber-800 bg-amber-50 rounded-xl border border-amber-200 m-4">
-            <h3 class="font-bold text-base mb-2">⚠️ Falta vincular el Google Sheet</h3>
-            <p>Pega tu enlace CSV de Google Sheets en la variable <code>SHEET_CSV_URL</code> dentro del archivo <code>index.html</code>.</p>
-          </div>
-        `;
-        return;
-      }
-
       Papa.parse(SHEET_CSV_URL, {
         download: true,
         header: true,
@@ -137,8 +162,8 @@
           document.getElementById('loading').classList.add('hidden');
           document.getElementById('flashcard').classList.remove('hidden');
         },
-        error: function(err) {
-          document.getElementById('loading').innerHTML = '<p class="text-red-500">Error al cargar las tarjetas desde Google Sheets.</p>';
+        error: function() {
+          document.getElementById('loading').innerHTML = '<p class="text-red-400 font-semibold p-4">Error al conectar con Google Sheets.</p>';
         }
       });
     }
@@ -187,7 +212,7 @@
       const counterEl = document.getElementById('counter');
 
       if (!card) {
-        document.getElementById('cardFront').textContent = "No hay tarjetas con este filtro.";
+        document.getElementById('cardFront').textContent = "No hay tarjetas disponibles.";
         document.getElementById('cardCategory').textContent = "-";
         document.getElementById('cardLevel').textContent = "-";
         counterEl.textContent = "0 / 0";
@@ -198,7 +223,7 @@
       document.getElementById('cardFront').textContent = card.front || "";
       document.getElementById('cardBack').textContent = card.back || "";
       document.getElementById('cardExample').textContent = card.example ? `"${card.example}"` : "Sin ejemplo";
-      document.getElementById('cardTip').textContent = card.tip || "Revisa las colocaciones y gramática para Aptis.";
+      document.getElementById('cardTip').textContent = card.tip || "Revisa el uso en contexto para Aptis.";
       document.getElementById('cardCategory').textContent = card.category || "General";
       document.getElementById('cardLevel').textContent = card.level || "B2";
     }
@@ -245,14 +270,12 @@
       }, 150);
     }
 
-    // Navegación con teclado (Flechas y barra espaciadora)
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space') { e.preventDefault(); flipCard(); }
       else if (e.code === 'ArrowRight') nextCard();
       else if (e.code === 'ArrowLeft') prevCard();
     });
 
-    // Iniciar carga
     loadData();
   </script>
 </body>
