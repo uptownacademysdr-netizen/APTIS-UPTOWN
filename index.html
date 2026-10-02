@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aptis Flashcards Trainer</title>
+  <!-- Tailwind CSS para el diseño -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse para leer el Google Sheet automáticamente -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    .perspective { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col items-center p-4 selection:bg-indigo-100">
+
+  <!-- Header -->
+  <header class="w-full max-w-xl text-center py-6">
+    <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight">Aptis Flashcards</h1>
+    <p class="text-sm text-slate-500 mt-1">Practica gramática, vocabulario y conectores clave</p>
+  </header>
+
+  <!-- Filtros -->
+  <section class="w-full max-w-xl bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap gap-4 items-center justify-between">
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Categoría</label>
+      <select id="categoryFilter" class="bg-slate-50 border border-slate-300 text-sm rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        <option value="all">Todas las categorías</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel</label>
+      <select id="levelFilter" class="bg-slate-50 border border-slate-300 text-sm rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+        <option value="all">Todos los niveles</option>
+      </select>
+    </div>
+
+    <div class="text-right">
+      <span class="text-xs font-semibold text-slate-400 block uppercase">Progreso</span>
+      <span id="counter" class="text-base font-bold text-indigo-600">0 / 0</span>
+    </div>
+  </section>
+
+  <!-- Contenedor Flashcard -->
+  <main class="w-full max-w-xl perspective mb-6">
+    <div id="loading" class="text-center py-20 bg-white rounded-2xl shadow-md border border-slate-200">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-3"></div>
+      <p class="text-slate-600 font-medium">Cargando tarjetas...</p>
+    </div>
+
+    <div id="flashcard" class="relative w-full h-96 bg-transparent cursor-pointer transform-style-3d transition-transform duration-500 select-none hidden" onclick="flipCard()">
+      <!-- Cara Delantera -->
+      <div class="absolute inset-0 bg-white border border-slate-200 rounded-2xl p-6 shadow-md flex flex-col justify-between backface-hidden">
+        <div class="flex justify-between items-center">
+          <span id="cardCategory" class="px-2.5 py-1 text-xs font-semibold bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100">Categoría</span>
+          <span id="cardLevel" class="px-2.5 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-full border border-amber-100">B2</span>
+        </div>
+        <div class="text-center my-auto px-4">
+          <p id="cardFront" class="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug">Término en inglés</p>
+          <span class="text-xs text-indigo-500 block mt-4 font-medium flex items-center justify-center gap-1">
+            👆 Toca para ver la respuesta
+          </span>
+        </div>
+        <div class="text-center">
+          <span class="text-[11px] text-slate-400 font-medium tracking-wide uppercase">Aptis Test Prep</span>
+        </div>
+      </div>
+
+      <!-- Cara Trasera -->
+      <div class="absolute inset-0 bg-indigo-900 border border-indigo-800 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Significado / Uso</span>
+          <p id="cardBack" class="text-xl font-bold mt-1 text-indigo-50">Definición en español</p>
+        </div>
+
+        <div class="my-3 bg-indigo-950/60 p-3.5 rounded-lg border border-indigo-800/80">
+          <span class="text-[11px] uppercase tracking-wider text-indigo-300 font-semibold block mb-1">Ejemplo en contexto</span>
+          <p id="cardExample" class="text-sm italic text-indigo-100">"Ejemplo de uso en oración"</p>
+        </div>
+
+        <div>
+          <span class="text-[11px] uppercase tracking-wider text-amber-300 font-semibold block mb-0.5">💡 Consejo Aptis</span>
+          <p id="cardTip" class="text-xs text-indigo-200">Consejo de examen</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Botones de Navegación -->
+  <footer class="w-full max-w-xl flex gap-3">
+    <button onclick="prevCard()" class="flex-1 py-3 px-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-300 shadow-sm transition active:scale-98">
+      ⬅ Anterior
+    </button>
+    <button onclick="randomCard()" class="py-3 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl border border-indigo-200 shadow-sm transition active:scale-98" title="Tarjeta aleatoria">
+      🎲
+    </button>
+    <button onclick="nextCard()" class="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-sm transition active:scale-98">
+      Siguiente ➡
+    </button>
+  </footer>
+
+  <script>
+    // ==========================================
+    // 🔗 PEGA AQUÍ TU ENLACE PUBLICADO DE GOOGLE SHEETS (CSV):
+    // ==========================================
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vREEMPLAZA_ESTO_POR_TU_LINK/pub?output=csv";
+
+    let allCards = [];
+    let filteredCards = [];
+    let currentIndex = 0;
+    let isFlipped = false;
+
+    // Cargar datos desde Google Sheets al iniciar
+    async function loadData() {
+      if (SHEET_CSV_URL.includes("REEMPLAZA_ESTO")) {
+        document.getElementById('loading').innerHTML = `
+          <div class="p-6 text-left text-sm text-amber-800 bg-amber-50 rounded-xl border border-amber-200 m-4">
+            <h3 class="font-bold text-base mb-2">⚠️ Falta vincular el Google Sheet</h3>
+            <p>Pega tu enlace CSV de Google Sheets en la variable <code>SHEET_CSV_URL</code> dentro del archivo <code>index.html</code>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      Papa.parse(SHEET_CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          allCards = results.data.filter(row => row.front && row.back);
+          setupFilters();
+          applyFilters();
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('flashcard').classList.remove('hidden');
+        },
+        error: function(err) {
+          document.getElementById('loading').innerHTML = '<p class="text-red-500">Error al cargar las tarjetas desde Google Sheets.</p>';
+        }
+      });
+    }
+
+    function setupFilters() {
+      const categories = [...new Set(allCards.map(c => c.category).filter(Boolean))];
+      const levels = [...new Set(allCards.map(c => c.level).filter(Boolean))];
+
+      const catSelect = document.getElementById('categoryFilter');
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        catSelect.appendChild(opt);
+      });
+
+      const lvlSelect = document.getElementById('levelFilter');
+      levels.forEach(lvl => {
+        const opt = document.createElement('option');
+        opt.value = lvl;
+        opt.textContent = lvl;
+        lvlSelect.appendChild(opt);
+      });
+
+      catSelect.addEventListener('change', applyFilters);
+      lvlSelect.addEventListener('change', applyFilters);
+    }
+
+    function applyFilters() {
+      const selectedCat = document.getElementById('categoryFilter').value;
+      const selectedLvl = document.getElementById('levelFilter').value;
+
+      filteredCards = allCards.filter(c => {
+        const matchCat = selectedCat === 'all' || c.category === selectedCat;
+        const matchLvl = selectedLvl === 'all' || c.level === selectedLvl;
+        return matchCat && matchLvl;
+      });
+
+      currentIndex = 0;
+      resetFlip();
+      renderCard();
+    }
+
+    function renderCard() {
+      const card = filteredCards[currentIndex];
+      const counterEl = document.getElementById('counter');
+
+      if (!card) {
+        document.getElementById('cardFront').textContent = "No hay tarjetas con este filtro.";
+        document.getElementById('cardCategory').textContent = "-";
+        document.getElementById('cardLevel').textContent = "-";
+        counterEl.textContent = "0 / 0";
+        return;
+      }
+
+      counterEl.textContent = `${currentIndex + 1} / ${filteredCards.length}`;
+      document.getElementById('cardFront').textContent = card.front || "";
+      document.getElementById('cardBack').textContent = card.back || "";
+      document.getElementById('cardExample').textContent = card.example ? `"${card.example}"` : "Sin ejemplo";
+      document.getElementById('cardTip').textContent = card.tip || "Revisa las colocaciones y gramática para Aptis.";
+      document.getElementById('cardCategory').textContent = card.category || "General";
+      document.getElementById('cardLevel').textContent = card.level || "B2";
+    }
+
+    function flipCard() {
+      const card = document.getElementById('flashcard');
+      isFlipped = !isFlipped;
+      card.classList.toggle('rotate-y-180', isFlipped);
+    }
+
+    function resetFlip() {
+      isFlipped = false;
+      document.getElementById('flashcard').classList.remove('rotate-y-180');
+    }
+
+    function nextCard() {
+      if (filteredCards.length <= 1) return;
+      resetFlip();
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % filteredCards.length;
+        renderCard();
+      }, 150);
+    }
+
+    function prevCard() {
+      if (filteredCards.length <= 1) return;
+      resetFlip();
+      setTimeout(() => {
+        currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
+        renderCard();
+      }, 150);
+    }
+
+    function randomCard() {
+      if (filteredCards.length <= 1) return;
+      resetFlip();
+      setTimeout(() => {
+        let randomIndex = currentIndex;
+        while (randomIndex === currentIndex) {
+          randomIndex = Math.floor(Math.random() * filteredCards.length);
+        }
+        currentIndex = randomIndex;
+        renderCard();
+      }, 150);
+    }
+
+    // Navegación con teclado (Flechas y barra espaciadora)
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+      else if (e.code === 'ArrowRight') nextCard();
+      else if (e.code === 'ArrowLeft') prevCard();
+    });
+
+    // Iniciar carga
+    loadData();
+  </script>
+</body>
+</html>
