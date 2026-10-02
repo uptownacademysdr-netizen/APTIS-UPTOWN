@@ -13,159 +13,217 @@
     .transform-style-3d { transform-style: preserve-3d; }
     .backface-hidden { backface-visibility: hidden; }
     .rotate-y-180 { transform: rotateY(180deg); }
+    /* Desactivar selección de texto al arrastrar */
+    .no-select {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      touch-action: pan-y;
+    }
   </style>
 </head>
-<body class="bg-[#14393e] min-h-screen text-slate-100 flex flex-col items-center justify-between p-4 selection:bg-teal-800 selection:text-white">
+<body class="bg-[#14393e] min-h-screen text-slate-100 flex flex-col items-center justify-between p-3 sm:p-4 selection:bg-teal-800 selection:text-white no-select">
 
   <!-- Contenedor Principal Centrado -->
   <div class="w-full max-w-xl flex flex-col items-center">
 
     <!-- Header con Logotipo y Enlace a la Academia -->
-    <header class="w-full text-center pt-4 pb-6 flex flex-col items-center">
-      <!-- Enlace y Logo -->
+    <header class="w-full text-center pt-2 pb-4 flex flex-col items-center">
       <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group inline-flex flex-col items-center transition hover:opacity-90">
         <img 
           src="https://academiauptown.com/wp-content/uploads/logo.png" 
           alt="Uptown Academy" 
-          class="h-14 sm:h-16 w-auto object-contain mb-2 drop-shadow-md transition-transform group-hover:scale-105"
+          class="h-12 sm:h-14 w-auto object-contain mb-1.5 drop-shadow-md transition-transform group-hover:scale-105"
           onerror="this.style.display='none'"
         />
-        <span class="text-xs uppercase tracking-widest font-bold text-teal-200/70 group-hover:text-teal-200 transition">
+        <span class="text-[11px] uppercase tracking-widest font-bold text-teal-200/70 group-hover:text-teal-200 transition">
           academiauptown.com ↗
         </span>
       </a>
 
-      <!-- Título de la Aplicación -->
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-3">
+      <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-2">
         Aptis Training Flashcards
       </h1>
-      <p class="text-xs sm:text-sm text-teal-100/80 mt-1">
-        Práctica oficial de vocabulario, colocaciones y conectores
+      <p class="text-xs text-teal-100/80 mt-0.5">
+        Desliza a la derecha para <b>Aprendida</b> o a la izquierda para <b>Repasar</b>
       </p>
     </header>
 
-    <!-- Filtros de Estudio -->
-    <section class="w-full bg-[#1b4b52] p-4 rounded-2xl shadow-lg border border-[#235d65] mb-6 flex flex-wrap gap-4 items-center justify-between">
-      <div class="flex-1 min-w-[140px]">
-        <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-1">Categoría</label>
-        <select id="categoryFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-sm font-medium rounded-xl p-2.5 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
+    <!-- Marcadores de Estado (Aprendidas vs Repasar) -->
+    <div class="w-full grid grid-cols-3 gap-2 mb-3 text-center">
+      <button onclick="setViewFilter('all')" id="tabAll" class="py-1.5 px-2 bg-[#1b4b52] border-2 border-teal-400 rounded-xl text-xs font-bold text-white transition">
+        Todas (<span id="countTotal">0</span>)
+      </button>
+      <button onclick="setViewFilter('review')" id="tabReview" class="py-1.5 px-2 bg-[#0f2c30] border border-[#235d65] rounded-xl text-xs font-bold text-amber-300 transition">
+        Repasar (<span id="countReview">0</span>)
+      </button>
+      <button onclick="setViewFilter('learned')" id="tabLearned" class="py-1.5 px-2 bg-[#0f2c30] border border-[#235d65] rounded-xl text-xs font-bold text-emerald-300 transition">
+        Aprendidas (<span id="countLearned">0</span>)
+      </button>
+    </div>
+
+    <!-- Filtros de Estudio (Categoría y Nivel) -->
+    <section class="w-full bg-[#1b4b52] p-3 rounded-2xl shadow-lg border border-[#235d65] mb-4 flex flex-wrap gap-3 items-center justify-between">
+      <div class="flex-1 min-w-[130px]">
+        <label class="block text-[10px] font-bold text-teal-200 uppercase tracking-wider mb-0.5">Categoría</label>
+        <select id="categoryFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-xs font-medium rounded-lg p-2 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
           <option value="all">Todas las categorías</option>
         </select>
       </div>
 
-      <div class="w-32">
-        <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-1">Nivel</label>
-        <select id="levelFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-sm font-medium rounded-xl p-2.5 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
-          <option value="all">Todos los niveles</option>
+      <div class="w-28">
+        <label class="block text-[10px] font-bold text-teal-200 uppercase tracking-wider mb-0.5">Nivel</label>
+        <select id="levelFilter" class="w-full bg-[#0f2c30] border border-[#245f67] text-xs font-medium rounded-lg p-2 text-white focus:ring-2 focus:ring-teal-400 outline-none transition">
+          <option value="all">Todos</option>
         </select>
       </div>
 
-      <div class="text-right pl-2">
-        <span class="text-[11px] font-bold text-teal-200 block uppercase tracking-wider">Tarjeta</span>
-        <span id="counter" class="text-base font-extrabold text-teal-300">0 / 0</span>
+      <div class="text-right pl-1">
+        <span class="text-[10px] font-bold text-teal-200 block uppercase tracking-wider">Tarjeta</span>
+        <span id="counter" class="text-sm font-extrabold text-teal-300">0 / 0</span>
       </div>
     </section>
 
-    <!-- Tarjeta Interactiva -->
-    <main class="w-full perspective mb-6">
+    <!-- Zona de la Tarjeta con Drag & Drop / Swipe -->
+    <main class="w-full perspective mb-4 relative">
       <div id="loading" class="text-center py-20 bg-[#1b4b52] rounded-2xl shadow-lg border border-[#235d65]">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-400 border-t-transparent mb-3"></div>
         <p class="text-teal-100 font-medium text-sm">Cargando material de Aptis...</p>
       </div>
 
-      <div id="flashcard" class="relative w-full h-[380px] bg-transparent cursor-pointer transform-style-3d transition-transform duration-500 select-none hidden" onclick="flipCard()">
-        <!-- Front Side -->
-        <div class="absolute inset-0 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between backface-hidden text-slate-800">
-          <div class="flex justify-between items-center">
-            <span id="cardCategory" class="px-3 py-1 text-xs font-semibold bg-[#14393e]/10 text-[#14393e] rounded-full border border-[#14393e]/20">Categoría</span>
-            <span id="cardLevel" class="px-3 py-1 text-xs font-bold bg-amber-50 text-amber-700 rounded-full border border-amber-200">B2</span>
-          </div>
-
-          <div class="text-center my-auto px-2">
-            <p id="cardFront" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">Cargando...</p>
-            <span class="inline-flex items-center gap-1.5 text-xs text-[#14393e] bg-teal-50 border border-teal-200 rounded-full px-3 py-1.5 mt-5 font-semibold">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" /></svg>
-              Toca para ver el reverso
-            </span>
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
-            <span>Uptown Language Academy</span>
-            <span>Espacio / Clic para voltear</span>
-          </div>
+      <!-- Tarjeta Contenedora Deslizable -->
+      <div id="cardContainer" class="relative w-full h-[370px] cursor-grab active:cursor-grabbing transition-transform select-none hidden">
+        
+        <!-- Indicadores flotantes de Swipe -->
+        <div id="badgeReview" class="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs uppercase tracking-wider shadow-lg opacity-0 transition-opacity pointer-events-none rotate-6">
+          ↻ Repasar
+        </div>
+        <div id="badgeLearned" class="absolute top-4 left-4 z-20 px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-lg opacity-0 transition-opacity pointer-events-none -rotate-6">
+          ✓ Aprendida
         </div>
 
-        <!-- Back Side -->
-        <div class="absolute inset-0 bg-[#0e272b] border border-[#1b4b52] text-white rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
-          <div>
-            <span class="text-[11px] uppercase tracking-wider text-teal-300 font-bold">Traducción / Significado</span>
-            <p id="cardBack" class="text-xl sm:text-2xl font-bold mt-1 text-teal-50">Significado</p>
+        <div id="flashcard" class="w-full h-full transform-style-3d transition-transform duration-500">
+          <!-- Frente -->
+          <div class="absolute inset-0 bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col justify-between backface-hidden text-slate-800">
+            <div class="flex justify-between items-center">
+              <span id="cardCategory" class="px-2.5 py-0.5 text-xs font-semibold bg-[#14393e]/10 text-[#14393e] rounded-full border border-[#14393e]/20">Categoría</span>
+              <span id="cardLevel" class="px-2.5 py-0.5 text-xs font-bold bg-amber-50 text-amber-700 rounded-full border border-amber-200">B2</span>
+            </div>
+
+            <div class="text-center my-auto px-2">
+              <p id="cardFront" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">Cargando...</p>
+              <div class="flex justify-center mt-4">
+                <span class="inline-flex items-center gap-1.5 text-xs text-[#14393e] bg-teal-50 border border-teal-200 rounded-full px-3 py-1 font-semibold">
+                  Toca para ver el reverso
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+              <span>👈 Desliza Repasar</span>
+              <span>Desliza Aprendida 👉</span>
+            </div>
           </div>
 
-          <div class="my-3 bg-[#14393e]/70 p-4 rounded-2xl border border-[#235d65]">
-            <span class="text-[11px] uppercase tracking-wider text-teal-300 font-bold block mb-1">Ejemplo de uso</span>
-            <p id="cardExample" class="text-sm italic text-teal-100">"Example sentence goes here"</p>
-          </div>
+          <!-- Reverso -->
+          <div class="absolute inset-0 bg-[#0e272b] border border-[#1b4b52] text-white rounded-3xl p-6 sm:p-7 shadow-2xl flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-teal-300 font-bold">Traducción / Significado</span>
+              <p id="cardBack" class="text-xl sm:text-2xl font-bold mt-1 text-teal-50">Significado</p>
+            </div>
 
-          <div>
-            <span class="text-[11px] uppercase tracking-wider text-amber-300 font-bold block mb-1">💡 Consejo Aptis</span>
-            <p id="cardTip" class="text-xs text-teal-100/90">Consejo clave para el examen.</p>
+            <div class="my-2 bg-[#14393e]/80 p-3.5 rounded-2xl border border-[#235d65]">
+              <span class="text-[10px] uppercase tracking-wider text-teal-300 font-bold block mb-1">Ejemplo de uso</span>
+              <p id="cardExample" class="text-xs sm:text-sm italic text-teal-100">"Example sentence goes here"</p>
+            </div>
+
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-amber-300 font-bold block mb-0.5">💡 Consejo Aptis</span>
+              <p id="cardTip" class="text-xs text-teal-100/90">Consejo clave para el examen.</p>
+            </div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Controles / Navegación -->
-    <footer class="w-full flex gap-3">
-      <button onclick="prevCard()" class="flex-1 py-3 px-4 bg-[#1b4b52] hover:bg-[#235d65] text-white font-bold text-sm rounded-xl border border-[#2b6a74] shadow-md transition active:scale-95 flex items-center justify-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-        Anterior
+    <!-- Botones Rápidos de Decisión -->
+    <div class="w-full grid grid-cols-2 gap-3 mb-3">
+      <button onclick="markCard(false)" class="py-3 px-4 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 font-bold text-sm rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        Repasar (Izquierda)
       </button>
 
-      <button onclick="randomCard()" class="py-3 px-5 bg-[#0f2c30] hover:bg-[#1b4b52] text-teal-200 font-bold text-sm rounded-xl border border-[#235d65] shadow-md transition active:scale-95" title="Tarjeta aleatoria">
-        🎲
+      <button onclick="markCard(true)" class="py-3 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+        Aprendida (Derecha)
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
       </button>
+    </div>
 
-      <button onclick="nextCard()" class="flex-1 py-3 px-4 bg-teal-500 hover:bg-teal-400 text-slate-900 font-extrabold text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2">
-        Siguiente
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    <!-- Navegación Secundaria -->
+    <footer class="w-full flex gap-2">
+      <button onclick="prevCard()" class="flex-1 py-2 px-3 bg-[#1b4b52] hover:bg-[#235d65] text-teal-100 text-xs font-semibold rounded-lg border border-[#2b6a74] transition">
+        ← Tarjeta previa
+      </button>
+      <button onclick="flipCard()" class="py-2 px-4 bg-[#0f2c30] hover:bg-[#1b4b52] text-teal-200 text-xs font-semibold rounded-lg border border-[#235d65] transition">
+        Voltear ↻
+      </button>
+      <button onclick="nextCard()" class="flex-1 py-2 px-3 bg-[#1b4b52] hover:bg-[#235d65] text-teal-100 text-xs font-semibold rounded-lg border border-[#2b6a74] transition">
+        Omitir →
       </button>
     </footer>
 
   </div>
 
-  <!-- Pie de Página Institucional -->
-  <div class="mt-8 text-center text-xs text-teal-200/60 py-3">
+  <!-- Pie Institucional -->
+  <div class="mt-4 text-center text-[11px] text-teal-200/60 py-2">
     Desarrollado para alumnos de <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="font-semibold text-teal-100 hover:text-white underline decoration-teal-400/50">Uptown Language Academy</a>
   </div>
 
   <script>
-    // ==========================================
-    // 🔗 TU ENLACE CSV PUBLICADO DE GOOGLE SHEETS
-    // ==========================================
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1GO3YBXDNSSa8kRISPNkq8ETGTHQEbMtH4hmvimEdNNE/export?format=csv";
+    // Conexión directa a Google Sheets mediante GViz (evita bloqueos de permisos)
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1GO3YBXDNSSa8kRISPNkq8ETGTHQEbMtH4hmvimEdNNE/gviz/tq?tqx=out:csv";
 
     let allCards = [];
     let filteredCards = [];
     let currentIndex = 0;
     let isFlipped = false;
+    let currentView = 'all'; // 'all', 'review', 'learned'
+
+    // Conjuntos para guardar el progreso (se guardan en la memoria del navegador)
+    let learnedCards = new Set();
+    let reviewCards = new Set();
 
     async function loadData() {
-      Papa.parse(SHEET_CSV_URL, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          allCards = results.data.filter(row => row.front && row.back);
-          setupFilters();
-          applyFilters();
-          document.getElementById('loading').classList.add('hidden');
-          document.getElementById('flashcard').classList.remove('hidden');
-        },
-        error: function() {
-          document.getElementById('loading').innerHTML = '<p class="text-red-400 font-semibold p-4">Error al conectar con Google Sheets.</p>';
-        }
-      });
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        if (!response.ok) throw new Error("Error en la respuesta del servidor");
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            allCards = results.data.filter(row => row.front && row.back).map((card, index) => {
+              return { ...card, id: `card_${index}` };
+            });
+
+            if (allCards.length === 0) {
+              document.getElementById('loading').innerHTML = '<p class="text-amber-300 font-semibold p-4">No se detectaron tarjetas en la hoja.</p>';
+              return;
+            }
+
+            setupFilters();
+            applyFilters();
+            initSwipe();
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('cardContainer').classList.remove('hidden');
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loading').innerHTML = '<p class="text-red-400 font-semibold p-4">Error al conectar con Google Sheets. Comprueba que el archivo esté accesible para cualquier persona con el enlace.</p>';
+      }
     }
 
     function setupFilters() {
@@ -192,6 +250,21 @@
       lvlSelect.addEventListener('change', applyFilters);
     }
 
+    function setViewFilter(view) {
+      currentView = view;
+      ['tabAll', 'tabReview', 'tabLearned'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('border-2', 'border-teal-400', 'bg-[#1b4b52]');
+        el.classList.add('bg-[#0f2c30]', 'border-[#235d65]');
+      });
+
+      if (view === 'all') document.getElementById('tabAll').classList.add('border-2', 'border-teal-400', 'bg-[#1b4b52]');
+      if (view === 'review') document.getElementById('tabReview').classList.add('border-2', 'border-teal-400', 'bg-[#1b4b52]');
+      if (view === 'learned') document.getElementById('tabLearned').classList.add('border-2', 'border-teal-400', 'bg-[#1b4b52]');
+
+      applyFilters();
+    }
+
     function applyFilters() {
       const selectedCat = document.getElementById('categoryFilter').value;
       const selectedLvl = document.getElementById('levelFilter').value;
@@ -199,12 +272,24 @@
       filteredCards = allCards.filter(c => {
         const matchCat = selectedCat === 'all' || c.category === selectedCat;
         const matchLvl = selectedLvl === 'all' || c.level === selectedLvl;
-        return matchCat && matchLvl;
+
+        let matchView = true;
+        if (currentView === 'review') matchView = reviewCards.has(c.id);
+        if (currentView === 'learned') matchView = learnedCards.has(c.id);
+
+        return matchCat && matchLvl && matchView;
       });
 
       currentIndex = 0;
       resetFlip();
+      updateCounters();
       renderCard();
+    }
+
+    function updateCounters() {
+      document.getElementById('countTotal').textContent = allCards.length;
+      document.getElementById('countReview').textContent = reviewCards.size;
+      document.getElementById('countLearned').textContent = learnedCards.size;
     }
 
     function renderCard() {
@@ -212,7 +297,10 @@
       const counterEl = document.getElementById('counter');
 
       if (!card) {
-        document.getElementById('cardFront').textContent = "No hay tarjetas disponibles.";
+        document.getElementById('cardFront').textContent = "No hay tarjetas en esta sección.";
+        document.getElementById('cardBack').textContent = "";
+        document.getElementById('cardExample').textContent = "-";
+        document.getElementById('cardTip').textContent = "-";
         document.getElementById('cardCategory').textContent = "-";
         document.getElementById('cardLevel').textContent = "-";
         counterEl.textContent = "0 / 0";
@@ -257,23 +345,136 @@
       }, 150);
     }
 
-    function randomCard() {
-      if (filteredCards.length <= 1) return;
-      resetFlip();
-      setTimeout(() => {
-        let randomIndex = currentIndex;
-        while (randomIndex === currentIndex) {
-          randomIndex = Math.floor(Math.random() * filteredCards.length);
-        }
-        currentIndex = randomIndex;
-        renderCard();
-      }, 150);
+    // Clasificar tarjeta: aprendida (true) o repasar (false)
+    function markCard(isLearned) {
+      const card = filteredCards[currentIndex];
+      if (!card) return;
+
+      if (isLearned) {
+        learnedCards.add(card.id);
+        reviewCards.delete(card.id);
+        animateSwipeOut(true);
+      } else {
+        reviewCards.add(card.id);
+        learnedCards.delete(card.id);
+        animateSwipeOut(false);
+      }
     }
 
+    function animateSwipeOut(toRight) {
+      const container = document.getElementById('cardContainer');
+      const badge = toRight ? document.getElementById('badgeLearned') : document.getElementById('badgeReview');
+
+      badge.style.opacity = '1';
+      container.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+      container.style.transform = `translateX(${toRight ? 450 : -450}px) rotate(${toRight ? 25 : -25}deg)`;
+      container.style.opacity = '0';
+
+      setTimeout(() => {
+        badge.style.opacity = '0';
+        updateCounters();
+
+        if (currentView !== 'all') {
+          applyFilters();
+        } else {
+          currentIndex = (currentIndex + 1) % filteredCards.length;
+          renderCard();
+        }
+
+        resetFlip();
+        container.style.transition = 'none';
+        container.style.transform = 'translateX(0px) rotate(0deg)';
+        container.style.opacity = '1';
+      }, 350);
+    }
+
+    // ==========================================
+    // GESTOS TÁCTILES Y DE RATÓN (SWIPE / DRAG)
+    // ==========================================
+    function initSwipe() {
+      const container = document.getElementById('cardContainer');
+      const badgeLearned = document.getElementById('badgeLearned');
+      const badgeReview = document.getElementById('badgeReview');
+
+      let startX = 0;
+      let currentX = 0;
+      let isDragging = false;
+      let startTime = 0;
+
+      function onTouchStart(x) {
+        if (filteredCards.length === 0) return;
+        isDragging = true;
+        startX = x;
+        currentX = x;
+        startTime = Date.now();
+        container.style.transition = 'none';
+      }
+
+      function onTouchMove(x) {
+        if (!isDragging) return;
+        currentX = x;
+        const diffX = currentX - startX;
+        const rotation = diffX * 0.05;
+        container.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+
+        // Opacidad de las pistas
+        if (diffX > 40) {
+          badgeLearned.style.opacity = Math.min((diffX - 40) / 80, 1);
+          badgeReview.style.opacity = 0;
+        } else if (diffX < -40) {
+          badgeReview.style.opacity = Math.min((-diffX - 40) / 80, 1);
+          badgeLearned.style.opacity = 0;
+        } else {
+          badgeLearned.style.opacity = 0;
+          badgeReview.style.opacity = 0;
+        }
+      }
+
+      function onTouchEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = currentX - startX;
+        const elapsedTime = Date.now() - startTime;
+
+        badgeLearned.style.opacity = 0;
+        badgeReview.style.opacity = 0;
+
+        // Si fue solo un clic/toque rápido sin mover casi nada: voltear
+        if (Math.abs(diffX) < 15 && elapsedTime < 300) {
+          flipCard();
+          container.style.transform = 'translateX(0px) rotate(0deg)';
+          return;
+        }
+
+        // Si el arrastre superó el umbral:
+        if (diffX > 110) {
+          markCard(true); // Derecha: Aprendida
+        } else if (diffX < -110) {
+          markCard(false); // Izquierda: Repasar
+        } else {
+          // Devolver a la posición original
+          container.style.transition = 'transform 0.25s ease';
+          container.style.transform = 'translateX(0px) rotate(0deg)';
+        }
+      }
+
+      // Eventos Táctiles (Móvil/Tablet)
+      container.addEventListener('touchstart', e => onTouchStart(e.touches[0].clientX), { passive: true });
+      window.addEventListener('touchmove', e => { if (isDragging) onTouchMove(e.touches[0].clientX); }, { passive: true });
+      window.addEventListener('touchend', onTouchEnd);
+
+      // Eventos de Ratón (Ordenador)
+      container.addEventListener('mousedown', e => onTouchStart(e.clientX));
+      window.addEventListener('mousemove', e => { if (isDragging) onTouchMove(e.clientX); });
+      window.addEventListener('mouseup', onTouchEnd);
+    }
+
+    // Atajos de teclado:
+    // Espacio: Voltear | Flecha Izquierda: Repasar | Flecha Derecha: Aprendida
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space') { e.preventDefault(); flipCard(); }
-      else if (e.code === 'ArrowRight') nextCard();
-      else if (e.code === 'ArrowLeft') prevCard();
+      else if (e.code === 'ArrowRight') markCard(true);
+      else if (e.code === 'ArrowLeft') markCard(false);
     });
 
     loadData();
