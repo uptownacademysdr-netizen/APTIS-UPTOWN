@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Aptis Flashcards Trainer | Uptown Academy</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,25 +11,23 @@
   <style>
     .perspective { perspective: 1000px; }
     .transform-style-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
     .rotate-y-180 { transform: rotateY(180deg); }
-    /* Desactivar selección de texto al arrastrar */
-    .no-select {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+    
+    .touch-card {
       touch-action: pan-y;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
   </style>
 </head>
-<body class="bg-[#14393e] min-h-screen text-slate-100 flex flex-col items-center justify-between p-3 sm:p-4 selection:bg-teal-800 selection:text-white no-select">
+<body class="bg-[#14393e] min-h-screen text-slate-100 flex flex-col items-center justify-between p-3 sm:p-4 selection:bg-teal-800 selection:text-white">
 
   <!-- Contenedor Principal Centrado -->
   <div class="w-full max-w-xl flex flex-col items-center">
 
     <!-- Header con Logotipo y Enlace a la Academia -->
-    <header class="w-full text-center pt-2 pb-4 flex flex-col items-center">
+    <header class="w-full text-center pt-2 pb-3 flex flex-col items-center">
       <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group inline-flex flex-col items-center transition hover:opacity-90">
         <img 
           src="https://academiauptown.com/wp-content/uploads/logo.png" 
@@ -42,11 +40,11 @@
         </span>
       </a>
 
-      <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-2">
+      <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1.5">
         Aptis Training Flashcards
       </h1>
       <p class="text-xs text-teal-100/80 mt-0.5">
-        Desliza a la derecha para <b>Aprendida</b> o a la izquierda para <b>Repasar</b>
+        Toca la tarjeta para ver la respuesta o desliza para clasificarla
       </p>
     </header>
 
@@ -85,15 +83,15 @@
       </div>
     </section>
 
-    <!-- Zona de la Tarjeta con Drag & Drop / Swipe -->
-    <main class="w-full perspective mb-4 relative">
+    <!-- Zona de la Tarjeta -->
+    <main class="w-full perspective mb-3 relative">
       <div id="loading" class="text-center py-20 bg-[#1b4b52] rounded-2xl shadow-lg border border-[#235d65]">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-400 border-t-transparent mb-3"></div>
         <p class="text-teal-100 font-medium text-sm">Cargando material de Aptis...</p>
       </div>
 
       <!-- Tarjeta Contenedora Deslizable -->
-      <div id="cardContainer" class="relative w-full h-[370px] cursor-grab active:cursor-grabbing transition-transform select-none hidden">
+      <div id="cardContainer" class="touch-card relative w-full h-[370px] cursor-pointer transition-transform select-none hidden">
         
         <!-- Indicadores flotantes de Swipe -->
         <div id="badgeReview" class="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs uppercase tracking-wider shadow-lg opacity-0 transition-opacity pointer-events-none rotate-6">
@@ -113,10 +111,15 @@
 
             <div class="text-center my-auto px-2">
               <p id="cardFront" class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug">Cargando...</p>
-              <div class="flex justify-center mt-4">
-                <span class="inline-flex items-center gap-1.5 text-xs text-[#14393e] bg-teal-50 border border-teal-200 rounded-full px-3 py-1 font-semibold">
+              
+              <!-- Botón visible de toque garantizado -->
+              <div class="mt-5">
+                <button type="button" onclick="event.stopPropagation(); flipCard();" class="inline-flex items-center gap-2 text-xs text-[#14393e] bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-full px-4 py-2 font-bold shadow-sm transition active:scale-95">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
                   Toca para ver el reverso
-                </span>
+                </button>
               </div>
             </div>
 
@@ -129,7 +132,12 @@
           <!-- Reverso -->
           <div class="absolute inset-0 bg-[#0e272b] border border-[#1b4b52] text-white rounded-3xl p-6 sm:p-7 shadow-2xl flex flex-col justify-between backface-hidden rotate-y-180 overflow-y-auto">
             <div>
-              <span class="text-[10px] uppercase tracking-wider text-teal-300 font-bold">Traducción / Significado</span>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] uppercase tracking-wider text-teal-300 font-bold">Significado</span>
+                <button type="button" onclick="event.stopPropagation(); flipCard();" class="text-[11px] text-teal-300 bg-white/10 px-2.5 py-1 rounded-lg hover:bg-white/20">
+                  Volver al frente ↻
+                </button>
+              </div>
               <p id="cardBack" class="text-xl sm:text-2xl font-bold mt-1 text-teal-50">Significado</p>
             </div>
 
@@ -147,7 +155,7 @@
       </div>
     </main>
 
-    <!-- Botones Rápidos de Decisión -->
+    <!-- Botones de Acción Rápida -->
     <div class="w-full grid grid-cols-2 gap-3 mb-3">
       <button onclick="markCard(false)" class="py-3 px-4 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 font-bold text-sm rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -160,13 +168,13 @@
       </button>
     </div>
 
-    <!-- Navegación Secundaria -->
+    <!-- Navegación Inferior -->
     <footer class="w-full flex gap-2">
       <button onclick="prevCard()" class="flex-1 py-2 px-3 bg-[#1b4b52] hover:bg-[#235d65] text-teal-100 text-xs font-semibold rounded-lg border border-[#2b6a74] transition">
         ← Tarjeta previa
       </button>
-      <button onclick="flipCard()" class="py-2 px-4 bg-[#0f2c30] hover:bg-[#1b4b52] text-teal-200 text-xs font-semibold rounded-lg border border-[#235d65] transition">
-        Voltear ↻
+      <button onclick="flipCard()" class="py-2 px-4 bg-[#0f2c30] hover:bg-[#1b4b52] text-teal-200 text-xs font-bold rounded-lg border border-[#235d65] transition">
+        Girar ↻
       </button>
       <button onclick="nextCard()" class="flex-1 py-2 px-3 bg-[#1b4b52] hover:bg-[#235d65] text-teal-100 text-xs font-semibold rounded-lg border border-[#2b6a74] transition">
         Omitir →
@@ -181,16 +189,14 @@
   </div>
 
   <script>
-    // Conexión directa a Google Sheets mediante GViz (evita bloqueos de permisos)
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1GO3YBXDNSSa8kRISPNkq8ETGTHQEbMtH4hmvimEdNNE/gviz/tq?tqx=out:csv";
 
     let allCards = [];
     let filteredCards = [];
     let currentIndex = 0;
     let isFlipped = false;
-    let currentView = 'all'; // 'all', 'review', 'learned'
+    let currentView = 'all';
 
-    // Conjuntos para guardar el progreso (se guardan en la memoria del navegador)
     let learnedCards = new Set();
     let reviewCards = new Set();
 
@@ -215,14 +221,14 @@
 
             setupFilters();
             applyFilters();
-            initSwipe();
+            initGestures();
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('cardContainer').classList.remove('hidden');
           }
         });
       } catch (err) {
         console.error(err);
-        document.getElementById('loading').innerHTML = '<p class="text-red-400 font-semibold p-4">Error al conectar con Google Sheets. Comprueba que el archivo esté accesible para cualquier persona con el enlace.</p>';
+        document.getElementById('loading').innerHTML = '<p class="text-red-400 font-semibold p-4">Error al conectar con Google Sheets.</p>';
       }
     }
 
@@ -345,7 +351,6 @@
       }, 150);
     }
 
-    // Clasificar tarjeta: aprendida (true) o repasar (false)
     function markCard(isLearned) {
       const card = filteredCards[currentIndex];
       if (!card) return;
@@ -367,7 +372,7 @@
 
       badge.style.opacity = '1';
       container.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
-      container.style.transform = `translateX(${toRight ? 450 : -450}px) rotate(${toRight ? 25 : -25}deg)`;
+      container.style.transform = `translateX(${toRight ? 450 : -450}px) rotate(${toRight ? 20 : -20}deg)`;
       container.style.opacity = '0';
 
       setTimeout(() => {
@@ -389,94 +394,207 @@
     }
 
     // ==========================================
-    // GESTOS TÁCTILES Y DE RATÓN (SWIPE / DRAG)
+    // CONTROL TÁCTIL Y DE RATÓN RESISTENTE A MÓVIL
     // ==========================================
-    function initSwipe() {
+    function initGestures() {
       const container = document.getElementById('cardContainer');
       const badgeLearned = document.getElementById('badgeLearned');
       const badgeReview = document.getElementById('badgeReview');
 
       let startX = 0;
+      let startY = 0;
       let currentX = 0;
       let isDragging = false;
-      let startTime = 0;
+      let isHorizontalSwipe = false;
 
-      function onTouchStart(x) {
+      function startDrag(x, y) {
         if (filteredCards.length === 0) return;
         isDragging = true;
+        isHorizontalSwipe = false;
         startX = x;
+        startY = y;
         currentX = x;
-        startTime = Date.now();
         container.style.transition = 'none';
       }
 
-      function onTouchMove(x) {
+      function moveDrag(x, y) {
         if (!isDragging) return;
-        currentX = x;
-        const diffX = currentX - startX;
-        const rotation = diffX * 0.05;
-        container.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+        const diffX = x - startX;
+        const diffY = y - startY;
 
-        // Opacidad de las pistas
-        if (diffX > 40) {
-          badgeLearned.style.opacity = Math.min((diffX - 40) / 80, 1);
-          badgeReview.style.opacity = 0;
-        } else if (diffX < -40) {
-          badgeReview.style.opacity = Math.min((-diffX - 40) / 80, 1);
-          badgeLearned.style.opacity = 0;
-        } else {
-          badgeLearned.style.opacity = 0;
-          badgeReview.style.opacity = 0;
+        // Detectar si el usuario está haciendo swipe horizontal o intentando hacer scroll vertical
+        if (!isHorizontalSwipe) {
+          if (Math.abs(diffX) > 12 && Math.abs(diffX) > Math.abs(diffY)) {
+            isHorizontalSwipe = true;
+          } else if (Math.abs(diffY) > 12) {
+            // Es scroll vertical: no interferir
+            isDragging = false;
+            return;
+          }
+        }
+
+        if (isHorizontalSwipe) {
+          currentX = x;
+          const rotation = diffX * 0.05;
+          container.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+
+          if (diffX > 40) {
+            badgeLearned.style.opacity = Math.min((diffX - 40) / 70, 1);
+            badgeReview.style.opacity = 0;
+          } else if (diffX < -40) {
+            badgeReview.style.opacity = Math.min((-diffX - 40) / 70, 1);
+            badgeLearned.style.opacity = 0;
+          } else {
+            badgeLearned.style.opacity = 0;
+            badgeReview.style.opacity = 0;
+          }
         }
       }
 
-      function onTouchEnd() {
-        if (!isDragging) return;
-        isDragging = false;
+      function endDrag() {
+        if (!isDragging && !isHorizontalSwipe) return;
         const diffX = currentX - startX;
-        const elapsedTime = Date.now() - startTime;
 
         badgeLearned.style.opacity = 0;
         badgeReview.style.opacity = 0;
 
-        // Si fue solo un clic/toque rápido sin mover casi nada: voltear
-        if (Math.abs(diffX) < 15 && elapsedTime < 300) {
+        if (isHorizontalSwipe) {
+          if (diffX > 90) {
+            markCard(true); // Derecha
+          } else if (diffX < -90) {
+            markCard(false); // Izquierda
+          } else {
+            container.style.transition = 'transform 0.25s ease';
+            container.style.transform = 'translateX(0px) rotate(0deg)';
+          }
+        } else {
+          // Si apenas se movió (toque intencionado de dedo o clic de ratón)
           flipCard();
           container.style.transform = 'translateX(0px) rotate(0deg)';
-          return;
         }
 
-        // Si el arrastre superó el umbral:
-        if (diffX > 110) {
-          markCard(true); // Derecha: Aprendida
-        } else if (diffX < -110) {
-          markCard(false); // Izquierda: Repasar
-        } else {
-          // Devolver a la posición original
-          container.style.transition = 'transform 0.25s ease';
-          container.style.transform = 'translateX(0px) rotate(0deg)';
-        }
+        isDragging = false;
+        isHorizontalSwipe = false;
       }
 
-      // Eventos Táctiles (Móvil/Tablet)
-      container.addEventListener('touchstart', e => onTouchStart(e.touches[0].clientX), { passive: true });
-      window.addEventListener('touchmove', e => { if (isDragging) onTouchMove(e.touches[0].clientX); }, { passive: true });
-      window.addEventListener('touchend', onTouchEnd);
+      // Eventos táctiles
+      container.addEventListener('touchstart', e => {
+        startDrag(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
 
-      // Eventos de Ratón (Ordenador)
-      container.addEventListener('mousedown', e => onTouchStart(e.clientX));
-      window.addEventListener('mousemove', e => { if (isDragging) onTouchMove(e.clientX); });
-      window.addEventListener('mouseup', onTouchEnd);
+      window.addEventListener('touchmove', e => {
+        if (isDragging) moveDrag(e.touches[0El problema en dispositivos móviles se debe a un conflicto típico entre dos eventos táctiles:
+1. El gesto de **deslizar** (`touchstart` / `touchmove`) interfiere con el evento nativo de **pulsar** (`click` / tap).
+2. La propiedad CSS de 3D (`transform-style: preserve-3d` y `backface-visibility: hidden`) suele presentar fallos de renderizado en navegadores móviles basados en WebKit (Safari en iOS y Chrome en Android), provocando que la cara trasera quede oculta o inaccesible tras rotar.
+
+Para resolverlo de forma limpia y garantizada en pantallas táctiles:
+
+---
+
+### 1. Separar el toque de volteo del gesto de arrastre
+
+En lugar de delegar el volteo a un cálculo de tiempo dentro del arrastre, se añade un manejador explícito con un pequeño botón/área táctil o usando el evento `click` normal, asegurándonos de que solo se active si la distancia recorrida con el dedo fue prácticamente cero.
+
+Reemplaza la función `initSwipe()` y los eventos táctiles en la sección `<script>` por este bloque mejorado:
+
+```javascript
+function initSwipe() {
+  const container = document.getElementById('cardContainer');
+  const badgeLearned = document.getElementById('badgeLearned');
+  const badgeReview = document.getElementById('badgeReview');
+
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let isDragging = false;
+  let hasMoved = false;
+
+  function onTouchStart(x, y) {
+    if (filteredCards.length === 0) return;
+    isDragging = true;
+    hasMoved = false;
+    startX = x;
+    startY = y;
+    currentX = x;
+    container.style.transition = 'none';
+  }
+
+  function onTouchMove(x, y) {
+    if (!isDragging) return;
+    const diffX = x - startX;
+    const diffY = y - startY;
+
+    // Si el usuario hace scroll vertical normal, no activar el arrastre horizontal
+    if (!hasMoved && Math.abs(diffY) > Math.abs(diffX)) {
+      isDragging = false;
+      return;
     }
 
-    // Atajos de teclado:
-    // Espacio: Voltear | Flecha Izquierda: Repasar | Flecha Derecha: Aprendida
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') { e.preventDefault(); flipCard(); }
-      else if (e.code === 'ArrowRight') markCard(true);
-      else if (e.code === 'ArrowLeft') markCard(false);
-    });
+    if (Math.abs(diffX) > 10) {
+      hasMoved = true;
+    }
 
+    currentX = x;
+    const rotation = diffX * 0.05;
+    container.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+
+    if (diffX > 40) {
+      badgeLearned.style.opacity = Math.min((diffX - 40) / 80, 1);
+      badgeReview.style.opacity = 0;
+    } else if (diffX < -40) {
+      badgeReview.style.opacity = Math.min((-diffX - 40) / 80, 1);
+      badgeLearned.style.opacity = 0;
+    } else {
+      badgeLearned.style.opacity = 0;
+      badgeReview.style.opacity = 0;
+    }
+  }
+
+  function onTouchEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    const diffX = currentX - startX;
+
+    badgeLearned.style.opacity = 0;
+    badgeReview.style.opacity = 0;
+
+    // Si apenas se movió el dedo (tap limpio), voltear la tarjeta
+    if (!hasMoved || Math.abs(diffX) < 15) {
+      flipCard();
+      container.style.transition = 'transform 0.2s ease';
+      container.style.transform = 'translateX(0px) rotate(0deg)';
+      return;
+    }
+
+    // Umbral de swipe
+    if (diffX > 90) {
+      markCard(true);
+    } else if (diffX < -90) {
+      markCard(false);
+    } else {
+      container.style.transition = 'transform 0.25s ease';
+      container.style.transform = 'translateX(0px) rotate(0deg)';
+    }
+  }
+
+  // Eventos táctiles
+  container.addEventListener('touchstart', e => {
+    onTouchStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  window.addEventListener('touchmove', e => {
+    if (isDragging && e.touches.length > 0) {
+      onTouchMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', onTouchEnd);
+
+  // Eventos de ratón para escritorio
+  container.addEventListener('mousedown', e => onTouchStart(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => { if (isDragging) onTouchMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', onTouchEnd);
+}
     loadData();
   </script>
 </body>
