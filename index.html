@@ -37,28 +37,27 @@
   <!-- Contenedor Principal Centrado -->
   <div class="w-full max-w-xl flex flex-col items-center">
 
-    <!-- Header: Logo a la Izquierda y Textos a la Derecha Justificados -->
-   <!-- Header: 1 sola línea garantizada en móvil -->
-    <header class="w-full pt-2 pb-3 mb-3 border-b border-[#1C2541] flex items-center justify-between gap-2">
-      <!-- Izquierda: Logo y enlace -->
+    <!-- Header: Logo a la izquierda y textos agrandados para móvil a la derecha -->
+    <header class="w-full pt-3 pb-4 mb-4 border-b border-[#1C2541] flex items-center justify-between gap-3">
+      <!-- Izquierda: Logotipo y Enlace -->
       <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-start shrink-0 transition-opacity hover:opacity-90">
         <img 
           src="https://academiauptown.com/wp-content/uploads/2024/12/logo-uptown-language-academy-buena-calidad.png" 
           alt="Uptown Language Academy" 
-          class="h-11 sm:h-16 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105"
+          class="h-14 sm:h-14 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105"
         />
-        <span class="text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold text-indigo-300/70 group-hover:text-indigo-200 transition mt-0.5">
+        <span class="text-xs uppercase tracking-wider font-bold text-indigo-300/80 group-hover:text-indigo-200 transition mt-1">
           academiauptown.com ↗
         </span>
       </a>
 
-      <!-- Derecha: Título en 1 sola línea estricta y subtítulo -->
-      <div class="text-right flex flex-col justify-center min-w-0">
-        <h1 class="text-[3.3vw] sm:text-xl md:text-2xl font-black text-white tracking-tight whitespace-nowrap leading-none">
-          Uptown Aptis Training Flashcards
+      <!-- Derecha: Título y Subtítulo con tamaño móvil potenciado -->
+      <div class="text-right flex flex-col justify-center">
+        <h1 class="text-2xl sm:text-2xl font-black text-white tracking-tight leading-snug">
+          Aptis Training Flashcards
         </h1>
-        <p class="text-[9px] sm:text-xs text-indigo-200/80 mt-1 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
-          Vocabulario, colocaciones y conectores
+        <p class="text-sm sm:text-xs text-indigo-200 mt-1 font-medium leading-tight">
+          Práctica de vocabulario, colocaciones y conectores
         </p>
       </div>
     </header>
@@ -66,13 +65,13 @@
     <!-- Barra de Modo de Estudio e Idioma -->
     <div class="w-full flex flex-wrap gap-2 justify-between items-center mb-3">
       <!-- Selector de Dirección de Idiomas -->
-      <button onclick="toggleLanguageMode()" id="langBtn" class="flex-1 min-w-[170px] py-2 px-3 bg-[#1C2541] hover:bg-[#253257] border border-[#3A506B]/50 rounded-xl text-xs font-bold text-indigo-200 flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+      <button onclick="toggleLanguageMode()" id="langBtn" class="flex-1 min-w-[180px] py-2 px-3 bg-[#1C2541] hover:bg-[#253257] border border-[#3A506B]/50 rounded-xl text-xs sm:text-sm font-bold text-indigo-200 flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
         <span>Modo:</span>
         <span id="langModeText" class="text-white bg-indigo-600/40 px-2 py-0.5 rounded-md border border-indigo-400/30">🇬🇧 Inglés ➔ 🇪🇸 Español</span>
         <span>⇄</span>
       </button>
 
-      <!-- Contador de Progreso (Aprendidas vs Repasar) -->
+      <!-- Contador de Progreso (Pestañas) -->
       <div class="flex gap-1.5">
         <button onclick="setViewFilter('all')" id="tabAll" class="py-2 px-3 bg-[#1C2541] border-2 border-indigo-400 rounded-xl text-xs font-bold text-white transition">
           Todas (<span id="countTotal">0</span>)
@@ -116,7 +115,7 @@
       </div>
 
       <!-- Tarjeta Contenedora Deslizable -->
-      <div id="cardContainer" class="touch-card relative w-full h-[380px] cursor-pointer transition-transform select-none hidden">
+      <div id="cardContainer" class="touch-card relative w-full h-[390px] cursor-pointer transition-transform select-none hidden">
         
         <!-- Indicadores Flotantes de Deslizar -->
         <div id="badgeReview" class="absolute top-4 right-4 z-20 px-3.5 py-1.5 rounded-xl bg-amber-500 text-white font-black text-xs uppercase tracking-wider shadow-lg opacity-0 transition-opacity pointer-events-none rotate-6">
@@ -184,7 +183,7 @@
       </button>
     </div>
 
-    <!-- Navegación, Volteo y Reinicio -->
+    <!-- Navegación y Volteo -->
     <footer class="w-full flex gap-2">
       <button onclick="prevCard()" class="flex-1 py-2.5 px-3 bg-[#1C2541] hover:bg-[#253257] text-indigo-100 text-xs font-semibold rounded-xl border border-[#3A506B]/50 transition active:scale-95">
         ← Anterior
@@ -437,7 +436,6 @@
         animateSwipeOut(false);
       }
 
-      // Persistir el progreso del estudiante
       saveProgress();
     }
 
@@ -468,7 +466,6 @@
       }, 300);
     }
 
-    // Gestos táctiles y de ratón (Swipe vs Tap)
     function initGestures() {
       const container = document.getElementById('cardContainer');
       const badgeLearned = document.getElementById('badgeLearned');
@@ -533,13 +530,13 @@
           return;
         }
 
-        // Arrastre completo
+        // Arrastre hacia la derecha o izquierda
         if (diffX > 85) {
           markCard(true); // Derecha: Aprendida
         } else if (diffX < -85) {
           markCard(false); // Izquierda: Repasar
         } else {
-          // Rebote
+          // Rebote si no llegó al umbral
           container.style.transition = 'transform 0.25s ease';
           container.style.transform = 'translateX(0px) rotate(0deg)';
         }
@@ -569,5 +566,4 @@
     loadData();
   </script>
 </body>
-</html>
 </html>
