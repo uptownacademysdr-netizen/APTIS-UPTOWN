@@ -38,25 +38,27 @@
   <div class="w-full max-w-xl flex flex-col items-center">
 
     <!-- Header: Logo a la izquierda y textos agrandados para móvil a la derecha -->
-    <header class="w-full pt-3 pb-4 mb-4 border-b border-[#1C2541] flex items-center justify-between gap-3">
-      <!-- Izquierda: Logotipo y Enlace -->
-      <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-start shrink-0 transition-opacity hover:opacity-90">
-        <img 
-          src="https://academiauptown.com/wp-content/uploads/2024/12/logo-uptown-language-academy-buena-calidad.png" 
-          alt="Uptown Language Academy" 
-          class="h-14 sm:h-14 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105"
-        />
-        <span class="text-xs uppercase tracking-wider font-bold text-indigo-300/80 group-hover:text-indigo-200 transition mt-1">
-          academiauptown.com ↗
-        </span>
-      </a>
+  <header class="w-full pt-3 pb-4 mb-4 border-b border-[#1C2541] flex items-center justify-between gap-3">
+      <!-- Izquierda: 20% del ancho con Logo y Enlace web justificados a la izquierda -->
+      <div class="w-[20%] flex flex-col items-start shrink-0">
+        <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-start transition-opacity hover:opacity-90 w-full">
+          <img 
+            src="https://academiauptown.com/wp-content/uploads/2024/12/logo-uptown-language-academy-buena-calidad.png" 
+            alt="Uptown Language Academy" 
+            class="w-full max-h-16 object-contain object-left drop-shadow-md transition-transform group-hover:scale-105"
+          />
+          <span class="text-[9px] sm:text-xs uppercase tracking-wider font-extrabold text-indigo-300 group-hover:text-indigo-200 transition mt-1 truncate w-full text-left">
+            uptown ↗
+          </span>
+        </a>
+      </div>
 
-      <!-- Derecha: Título y Subtítulo con tamaño móvil potenciado -->
-      <div class="text-right flex flex-col justify-center">
-        <h1 class="text-2xl sm:text-2xl font-black text-white tracking-tight leading-snug">
-          Aptis Training Flashcards
+      <!-- Derecha: 80% del ancho con "Aptis training flashcards" justificado a la derecha -->
+      <div class="w-[80%] text-right flex flex-col justify-center">
+        <h1 class="text-xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+          Aptis training flashcards
         </h1>
-        <p class="text-sm sm:text-xs text-indigo-200 mt-1 font-medium leading-tight">
+        <p class="text-xs sm:text-sm text-indigo-200 mt-1 font-medium leading-snug">
           Práctica de vocabulario, colocaciones y conectores
         </p>
       </div>
