@@ -38,24 +38,29 @@
   <div class="w-full max-w-xl flex flex-col items-center">
 
     <!-- Header con Logotipo Oficial y Enlace -->
-    <header class="w-full text-center pt-2 pb-4 flex flex-col items-center">
-      <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group inline-flex flex-col items-center transition hover:opacity-90">
+   <!-- Header: Logo a la izquierda y textos a la derecha -->
+    <header class="w-full pt-2 pb-4 flex flex-row items-center justify-between gap-3 border-b border-[#235d65]/60 mb-3">
+      <!-- Izquierda: Logotipo y enlace -->
+      <a href="https://academiauptown.com" target="_blank" rel="noopener noreferrer" class="group flex flex-col items-start transition hover:opacity-90 shrink-0">
         <img 
           src="https://academiauptown.com/wp-content/uploads/2024/12/cropped-nuevologoacademia.png" 
           alt="Uptown Language Academy" 
-          class="h-14 sm:h-16 w-auto object-contain mb-1.5 drop-shadow-md transition-transform group-hover:scale-105"
+          class="h-12 sm:h-14 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105"
         />
-        <span class="text-xs uppercase tracking-widest font-bold text-teal-200/70 group-hover:text-teal-200 transition">
+        <span class="text-[10px] uppercase tracking-widest font-bold text-teal-200/70 group-hover:text-teal-200 transition mt-0.5">
           academiauptown.com ↗
         </span>
       </a>
 
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-2">
-        Aptis Training Flashcards
-      </h1>
-      <p class="text-xs sm:text-sm text-teal-100/80 mt-1">
-        Práctica oficial de vocabulario, colocaciones y conectores
-      </p>
+      <!-- Derecha: Textos alineados -->
+      <div class="text-right">
+        <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
+          Aptis Training Flashcards
+        </h1>
+        <p class="text-[11px] sm:text-xs text-teal-100/80 mt-0.5">
+          Práctica de vocabulario, colocaciones y conectores
+        </p>
+      </div>
     </header>
 
     <!-- Barra de Modo de Estudio e Idioma -->
